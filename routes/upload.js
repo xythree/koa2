@@ -39,10 +39,6 @@ module.exports = (router, render) => {
                 console.log("上传进度:", (bytesReceived/bytesExpected).toFixed(2))
             }).on("end", function () {
                 console.log("上传结束")
-                resolve({
-                    code: 1,
-                    msg: "上传成功"
-                })
             }).on("error", function (err) {
                 console.error("上传失败", err)
                 reject({
@@ -50,8 +46,17 @@ module.exports = (router, render) => {
                     msg: "上传失败"
                 })
             }).parse(ctx.req, function (err, fields, files) {
+                let fileSrc = []
+
                 allFile.forEach((file, index) => {
-                    fs.renameSync("./" + file[1].path, "./static/images/" + +new Date + path.extname(file[1].name))
+                    let _src = "/images/upload/" + +new Date + path.extname(file[1].name)
+                    fs.rename("./" + file[1].path, "./static" + _src)
+                    fileSrc.push(_src)
+                })
+                resolve({
+                    code: 1,
+                    data: fileSrc,
+                    msg: "上传成功"
                 })
             })
 

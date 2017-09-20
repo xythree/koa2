@@ -1,6 +1,6 @@
 const koa = require("koa")
 const router = require("koa-router")()
-const serve = require("koa-static-cache")
+const serve = require("koa-static")
 const views = require("co-views")
 const bodyparser = require("koa-bodyparser")
 const session = require("koa-session2")
@@ -31,27 +31,14 @@ app.use(require("koa-compress")({
     flush: require('zlib').Z_SYNC_FLUSH //同步的刷新缓冲区数据
 }))
 
-
 app.use(bodyparser())
 
 app.use(serve(path.join(__dirname, "static"), {
     maxAge: 1000 * 60 * 60 * 24
 }))
 
+
 app.use(router.routes())
-
-app.use(async(ctx, next) => {
-
-    if (ctx.response.status == 404) {
-        if (ctx.request.header["content-type"]) {
-            ctx.status = 404
-            ctx.body = ""
-        } else {
-            ctx.redirect("/404")
-        }
-    }
-    next()
-})
 
 require("./routes/index")(router, render)
 require("./routes/upload")(router, render)
